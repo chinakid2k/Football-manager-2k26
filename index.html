@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Football Manager 2K26</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1>⚽ Football Manager 2K26</h1>
+                <div class="header-info">
+                    <span id="current-team">Manchester United FC</span>
+                    <span id="current-date">August 1, 2026</span>
+                    <span id="budget">Budget: $150M</span>
+                </div>
+            </div>
+            <nav class="main-nav">
+                <button class="nav-btn active" data-view="squad">Squad</button>
+                <button class="nav-btn" data-view="tactics">Tactics</button>
+                <button class="nav-btn" data-view="match">Match</button>
+                <button class="nav-btn" data-view="transfers">Transfers</button>
+                <button class="nav-btn" data-view="staff">Staff</button>
+                <button class="nav-btn" data-view="league">League Table</button>
+            </nav>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Squad View -->
+            <div id="squad-view" class="view active">
+                <div class="view-header">
+                    <h2>Squad Management</h2>
+                    <div class="controls">
+                        <input type="text" id="player-search" placeholder="Search players...">
+                        <select id="position-filter">
+                            <option value="all">All Positions</option>
+                            <option value="GK">Goalkeeper</option>
+                            <option value="DEF">Defender</option>
+                            <option value="MID">Midfielder</option>
+                            <option value="ATT">Attacker</option>
+                        </select>
+                        <select id="sort-by">
+                            <option value="overall">Overall Rating</option>
+                            <option value="age">Age</option>
+                            <option value="value">Value</option>
+                            <option value="wage">Wage</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="squad-list" class="squad-list"></div>
+                <div id="player-detail" class="player-detail hidden">
+                    <button class="close-detail" id="close-detail">×</button>
+                    <div class="player-detail-content"></div>
+                </div>
+            </div>
+
+            <!-- Tactics View -->
+            <div id="tactics-view" class="view">
+                <div class="view-header">
+                    <h2>Tactical Setup</h2>
+                    <select id="formation-select">
+                        <option value="4-4-2">4-4-2</option>
+                        <option value="4-3-3">4-3-3</option>
+                        <option value="4-2-3-1">4-2-3-1</option>
+                        <option value="3-5-2">3-5-2</option>
+                        <option value="4-1-4-1">4-1-4-1</option>
+                        <option value="3-4-3">3-4-3</option>
+                        <option value="5-3-2">5-3-2</option>
+                    </select>
+                </div>
+                <div class="tactics-container">
+                    <div class="formation-display">
+                        <canvas id="formation-canvas" width="800" height="600"></canvas>
+                        <div id="formation-positions"></div>
+                    </div>
+                    <div class="tactics-settings">
+                        <h3>Team Instructions</h3>
+                        <div class="instruction-group">
+                            <label>Passing Directness
+                                <input type="range" id="passing-directness" min="0" max="100" value="50">
+                                <span id="passing-value">50</span>
+                            </label>
+                            <label>Tempo
+                                <input type="range" id="tempo" min="0" max="100" value="50">
+                                <span id="tempo-value">50</span>
+                            </label>
+                            <label>Risk Taking
+                                <input type="range" id="risk-taking" min="0" max="100" value="50">
+                                <span id="risk-value">50</span>
+                            </label>
+                            <label>Attacking Width
+                                <input type="range" id="attacking-width" min="0" max="100" value="50">
+                                <span id="width-value">50</span>
+                            </label>
+                            <label>Pressing Intensity
+                                <input type="range" id="pressing" min="0" max="100" value="50">
+                                <span id="pressing-value">50</span>
+                            </label>
+                            <label>Defensive Line
+                                <input type="range" id="defensive-line" min="0" max="100" value="50">
+                                <span id="defense-value">50</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Match View -->
+            <div id="match-view" class="view">
+                <div class="view-header">
+                    <h2>Match Day</h2>
+                    <button id="start-match" class="btn-primary">Start Match</button>
+                </div>
+                <div class="match-container">
+                    <div class="match-info">
+                        <div class="team-box">
+                            <h3 id="home-team">Manchester United</h3>
+                            <div id="home-score" class="score">0</div>
+                        </div>
+                        <div class="match-time">
+                            <div id="match-clock">0'</div>
+                            <div id="match-status">Not Started</div>
+                        </div>
+                        <div class="team-box">
+                            <h3 id="away-team">Liverpool FC</h3>
+                            <div id="away-score" class="score">0</div>
+                        </div>
+                    </div>
+                    <canvas id="match-canvas" width="1000" height="650"></canvas>
+                    <div class="match-controls">
+                        <button id="play-pause" disabled>▶ Play</button>
+                        <button id="match-speed">Speed: 1x</button>
+                    </div>
+                    <div id="match-events" class="match-events">
+                        <h3>Match Events</h3>
+                        <div id="events-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transfers View -->
+            <div id="transfers-view" class="view">
+                <div class="view-header">
+                    <h2>Transfer Market</h2>
+                    <div class="controls">
+                        <input type="text" id="transfer-search" placeholder="Search available players...">
+                        <select id="transfer-position-filter">
+                            <option value="all">All Positions</option>
+                            <option value="GK">Goalkeeper</option>
+                            <option value="DEF">Defender</option>
+                            <option value="MID">Midfielder</option>
+                            <option value="ATT">Attacker</option>
+                        </select>
+                        <select id="transfer-budget-filter">
+                            <option value="all">All Budgets</option>
+                            <option value="0-10">Under $10M</option>
+                            <option value="10-30">$10M - $30M</option>
+                            <option value="30-60">$30M - $60M</option>
+                            <option value="60-999">Over $60M</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="transfer-list" class="transfer-list"></div>
+            </div>
+
+            <!-- Staff View -->
+            <div id="staff-view" class="view">
+                <div class="view-header">
+                    <h2>Staff Management</h2>
+                    <button id="hire-staff" class="btn-primary">Hire New Staff</button>
+                </div>
+                <div id="staff-list" class="staff-list"></div>
+            </div>
+
+            <!-- League Table View -->
+            <div id="league-view" class="view">
+                <div class="view-header">
+                    <h2>Premier League Table 2026/27</h2>
+                </div>
+                <table id="league-table" class="league-table">
+                    <thead>
+                        <tr>
+                            <th>Pos</th>
+                            <th>Team</th>
+                            <th>P</th>
+                            <th>W</th>
+                            <th>D</th>
+                            <th>L</th>
+                            <th>GF</th>
+                            <th>GA</th>
+                            <th>GD</th>
+                            <th>Pts</th>
+                        </tr>
+                    </thead>
+                    <tbody id="league-table-body"></tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="data/players.js"></script>
+    <script src="data/teams.js"></script>
+    <script src="js/formations.js"></script>
+    <script src="js/matchEngine.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
