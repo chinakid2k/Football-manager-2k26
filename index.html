@@ -19,7 +19,8 @@
                 </div>
             </div>
             <nav class="main-nav">
-                <button class="nav-btn active" data-view="squad">Squad</button>
+                <button class="nav-btn active" data-view="dashboard">Dashboard</button>
+                <button class="nav-btn" data-view="squad">Squad</button>
                 <button class="nav-btn" data-view="tactics">Tactics</button>
                 <button class="nav-btn" data-view="match">Match</button>
                 <button class="nav-btn" data-view="transfers">Transfers</button>
@@ -30,8 +31,107 @@
 
         <!-- Main Content Area -->
         <main class="main-content">
+            <!-- Dashboard View -->
+            <div id="dashboard-view" class="view active">
+                <div class="dashboard-grid">
+                    <!-- Next Match Card -->
+                    <div class="dashboard-card">
+                        <h3>Next Match</h3>
+                        <div id="next-match-info" class="next-match">
+                            <div class="match-teams">
+                                <span id="next-home-team">Manchester United</span>
+                                <span class="vs">vs</span>
+                                <span id="next-away-team">Liverpool FC</span>
+                            </div>
+                            <div id="next-match-date" class="match-date">Saturday, August 20, 2026</div>
+                            <button id="continue-to-match" class="btn-primary">Continue to Match</button>
+                        </div>
+                    </div>
+
+                    <!-- Team Form -->
+                    <div class="dashboard-card">
+                        <h3>Team Form</h3>
+                        <div id="team-form" class="team-form">
+                            <div class="form-indicators"></div>
+                            <div class="form-stats">
+                                <div><strong>League Position:</strong> <span id="league-position">4th</span></div>
+                                <div><strong>Points:</strong> <span id="team-points">0</span></div>
+                                <div><strong>Team Morale:</strong> <span id="team-morale">7.0/10</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Finances Summary -->
+                    <div class="dashboard-card">
+                        <h3>Finances</h3>
+                        <div id="finance-summary">
+                            <div class="finance-row">
+                                <span>Transfer Budget:</span>
+                                <strong id="transfer-budget-dash">$150M</strong>
+                            </div>
+                            <div class="finance-row">
+                                <span>Weekly Wages:</span>
+                                <strong id="weekly-wages">$2.5M</strong>
+                            </div>
+                            <div class="finance-row">
+                                <span>Net Spend:</span>
+                                <strong id="net-spend" class="positive">$0M</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Injuries -->
+                    <div class="dashboard-card">
+                        <h3>Injury Room</h3>
+                        <div id="injury-list">
+                            <p class="no-injuries">No injuries 🎉</p>
+                        </div>
+                    </div>
+
+                    <!-- Recent News -->
+                    <div class="dashboard-card large">
+                        <h3>Recent News</h3>
+                        <div id="news-feed" class="news-feed">
+                            <div class="news-item">
+                                <span class="news-date">Today</span>
+                                <p>Season 2026/27 begins! Good luck, manager.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Scout Reports -->
+                    <div class="dashboard-card">
+                        <h3>Latest Scout Reports</h3>
+                        <div id="scout-reports-summary">
+                            <p>No reports yet. Assign scouts to find players.</p>
+                            <button id="goto-scouting" class="btn-secondary">View Scouting</button>
+                        </div>
+                    </div>
+
+                    <!-- Training Report -->
+                    <div class="dashboard-card">
+                        <h3>Training Focus</h3>
+                        <div id="training-summary">
+                            <div><strong>Today's Focus:</strong> <span id="training-focus">Fitness</span></div>
+                            <div><strong>Intensity:</strong> <span id="training-intensity">Medium</span></div>
+                            <button id="manage-training" class="btn-secondary">Manage Training</button>
+                        </div>
+                    </div>
+
+                    <!-- Squad Overview -->
+                    <div class="dashboard-card">
+                        <h3>Squad Overview</h3>
+                        <div id="squad-overview">
+                            <div><strong>Squad Size:</strong> <span id="squad-size">25</span></div>
+                            <div><strong>Avg Age:</strong> <span id="avg-age">26.5</span></div>
+                            <div><strong>Avg Rating:</strong> <span id="avg-rating">175</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Squad View -->
-            <div id="squad-view" class="view active">
+            <div id="squad-view" class="view">
                 <div class="view-header">
                     <h2>Squad Management</h2>
                     <div class="controls">
@@ -203,10 +303,23 @@
     </div>
 
     <!-- Scripts -->
+    <!-- Data Files -->
     <script src="data/players.js"></script>
+    <script src="data/expandedPlayers.js"></script>
     <script src="data/teams.js"></script>
+
+    <!-- Game Engines -->
+    <script src="js/seasonEngine.js"></script>
+    <script src="js/trainingEngine.js"></script>
+    <script src="js/injuryEngine.js"></script>
+    <script src="js/transferEngine.js"></script>
+    <script src="js/financeEngine.js"></script>
+    <script src="js/moraleEngine.js"></script>
+    <script src="js/scoutEngine.js"></script>
     <script src="js/formations.js"></script>
     <script src="js/matchEngine.js"></script>
+
+    <!-- Main Application -->
     <script src="js/app.js"></script>
 </body>
 </html>

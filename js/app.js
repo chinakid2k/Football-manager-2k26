@@ -2,9 +2,9 @@
 
 class FootballManagerApp {
     constructor() {
-        this.currentView = 'squad';
+        this.currentView = 'dashboard';
         this.currentTeam = 'Manchester United';
-        this.currentDate = new Date('2026-08-01');
+        this.currentDate = new Date('2026-08-15');
         this.budget = 150000000;
         this.currentFormation = '4-3-3';
         this.tactics = {
@@ -21,8 +21,19 @@ class FootballManagerApp {
         this.staff = [];
         this.leagueTable = [];
 
+        // Game Engines
+        this.seasonEngine = new SeasonEngine();
+        this.trainingEngine = new TrainingEngine();
+        this.injuryEngine = new InjuryEngine();
+        this.transferEngine = new TransferEngine();
+        this.financeEngine = new FinanceEngine(this.budget);
+        this.moraleEngine = new MoraleEngine();
+        this.scoutEngine = new ScoutEngine();
+
         this.matchEngine = null;
         this.formationRenderer = null;
+
+        this.newsItems = [];
 
         this.init();
     }
@@ -31,8 +42,12 @@ class FootballManagerApp {
         // Load players
         this.loadPlayers();
 
+        // Initialize player morale and form
+        this.myPlayers.forEach(p => this.moraleEngine.initializePlayer(p));
+
         // Initialize UI
         this.setupNavigation();
+        this.setupDashboard();
         this.setupSquadView();
         this.setupTacticsView();
         this.setupMatchView();
@@ -44,8 +59,11 @@ class FootballManagerApp {
         this.loadGame();
 
         // Initial render
-        this.renderSquadView();
+        this.renderDashboard();
         this.updateHeader();
+
+        // Add initial news
+        this.addNews('Season 2026/27 begins! Good luck, manager.');
     }
 
     loadPlayers() {
@@ -91,6 +109,9 @@ class FootballManagerApp {
 
             // Render view-specific content
             switch (viewName) {
+                case 'dashboard':
+                    this.renderDashboard();
+                    break;
                 case 'squad':
                     this.renderSquadView();
                     break;
@@ -111,6 +132,114 @@ class FootballManagerApp {
                     break;
             }
         }
+    }
+
+    // DASHBOARD VIEW
+    setupDashboard() {
+        const continueBtn = document.getElementById('continue-to-match');
+        continueBtn?.addEventListener('click', () => {
+            this.switchView('match');
+        });
+    }
+
+    renderDashboard() {
+        // Update next match info
+        const nextMatch = this.seasonEngine.getNextMatch(this.currentTeam);
+        if (nextMatch) {
+            document.getElementById('next-home-team').textContent = nextMatch.home;
+            document.getElementById('next-away-team').textContent = nextMatch.away;
+            document.getElementById('next-match-date').textContent = nextMatch.date.toDateString();
+        }
+
+        // Update league position
+        const table = this.seasonEngine.getLeagueTable();
+        const position = table.findIndex(t => t.team === this.currentTeam) + 1;
+        document.getElementById('league-position').textContent = `${position}${this.getOrdinalSuffix(position)}`;
+        document.getElementById('team-points').textContent = table[position - 1]?.points || 0;
+
+        // Update team morale
+        const teamMorale = this.moraleEngine.updateTeamMorale(this.myPlayers);
+        document.getElementById('team-morale').textContent = `${teamMorale.toFixed(1)}/10`;
+
+        // Update finances
+        const finances = this.financeEngine.getFinancialReport();
+        document.getElementById('transfer-budget-dash').textContent = `$${(finances.transferBudget / 1000000).toFixed(0)}M`;
+        const wageBill = this.financeEngine.calculateWageBill(this.myPlayers);
+        document.getElementById('weekly-wages').textContent = `$${(wageBill.weekly / 1000000).toFixed(1)}M`;
+        const summary = this.transferEngine.getTransferSummary();
+        document.getElementById('net-spend').textContent = `$${(summary.netSpend / 1000000).toFixed(0)}M`;
+        document.getElementById('net-spend').className = summary.netSpend > 0 ? 'negative' : 'positive';
+
+        // Update injuries
+        const injuryReport = this.injuryEngine.getInjuryReport();
+        const injuryList = document.getElementById('injury-list');
+        if (injuryReport.total === 0) {
+            injuryList.innerHTML = '<p class="no-injuries">No injuries 🎉</p>';
+        } else {
+            injuryList.innerHTML = injuryReport.injuries.map(inj => `
+                <div class="injury-item">
+                    <strong>${inj.player}</strong> - ${inj.type} (${inj.daysRemaining} days)
+                </div>
+            `).join('');
+        }
+
+        // Update news feed
+        this.renderNewsFeed();
+
+        // Update squad overview
+        const avgAge = (this.myPlayers.reduce((sum, p) => sum + p.age, 0) / this.myPlayers.length).toFixed(1);
+        const avgRating = Math.floor(this.myPlayers.reduce((sum, p) => sum + p.overall, 0) / this.myPlayers.length);
+        document.getElementById('squad-size').textContent = this.myPlayers.length;
+        document.getElementById('avg-age').textContent = avgAge;
+        document.getElementById('avg-rating').textContent = avgRating;
+
+        // Update training info
+        const day = new Date().getDay();
+        const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+        const todaysTraining = this.trainingEngine.trainingSchedule[days[day]];
+        document.getElementById('training-focus').textContent = todaysTraining.focus;
+        document.getElementById('training-intensity').textContent = todaysTraining.intensity;
+    }
+
+    getOrdinalSuffix(num) {
+        const j = num % 10;
+        const k = num % 100;
+        if (j === 1 && k !== 11) return 'st';
+        if (j === 2 && k !== 12) return 'nd';
+        if (j === 3 && k !== 13) return 'rd';
+        return 'th';
+    }
+
+    addNews(message) {
+        this.newsItems.unshift({
+            date: new Date(),
+            message: message
+        });
+
+        // Keep only last 20 items
+        if (this.newsItems.length > 20) {
+            this.newsItems = this.newsItems.slice(0, 20);
+        }
+    }
+
+    renderNewsFeed() {
+        const newsFeed = document.getElementById('news-feed');
+        if (!newsFeed || this.newsItems.length === 0) return;
+
+        newsFeed.innerHTML = this.newsItems.map(item => {
+            const dateStr = this.isToday(item.date) ? 'Today' : item.date.toLocaleDateString();
+            return `
+                <div class="news-item">
+                    <span class="news-date">${dateStr}</span>
+                    <p>${item.message}</p>
+                </div>
+            `;
+        }).join('');
+    }
+
+    isToday(date) {
+        const today = new Date();
+        return date.toDateString() === today.toDateString();
     }
 
     // SQUAD VIEW
